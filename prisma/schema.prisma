@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// uncomment in case of development..
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output = "erd.pdf"
+  theme = "forest"
+}
+
+enum ScheduleStatusEnum {
+  FINISHED
+  CONFIRMED
+  PENDING
+  CANCELED
+}
+
+enum UserPermissionEnum {
+  CUSTOMER
+  EMPLOYEE
+  MASTER
+}
+
+enum EmployeeOccupationEnum {
+  EMPLOYEE
+  MANAGER
+}
+
+model User {
+  id String @id @default(uuid())
+
+  name String? @db.VarChar(150)
+  email String? @db.VarChar(255) @unique
+  password String? @db.VarChar(255)
+  phone String? @db.VarChar(11)
+  document String @db.VarChar(11) @unique
+  birthDate DateTime? @map("birth_date") @db.Date()
+  permission UserPermissionEnum @default(CUSTOMER)
+  isActive Boolean @default(true) @map("is_active")
+
+  schedules Schedule[]
+  company Company[]
+  employees Employee[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("users")
+}
+
+model Company {
+  id String @id @default(uuid())
+
+  userId String @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  name String @db.VarChar(150)
+  document String @db.VarChar(14)
+  corporateName String @db.VarChar(255) @map("corporate_name")
+  tradingName String? @db.VarChar(255) @map("trading_name")
+
+  schedules Schedule[]
+  employees Employee[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("companies")
+}
+
+model Specialty {
+  id String @id @default(uuid())
+
+  specialty String @db.VarChar(60)
+
+  employees Employee[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("specialties")
+}
+
+model Employee {
+  id String @id @default(uuid())
+
+  userId String @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  companyId String @map("company_id")
+  company Company @relation(fields: [companyId], references: [id])
+
+  specialtyId String @map("specialty_id")
+  specialty Specialty @relation(fields: [specialtyId], references: [id])
+
+  occupation EmployeeOccupationEnum @default(EMPLOYEE)
+
+  schedules Schedule[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("employees")
+}
+
+model Service {
+  id String @id @default(uuid())
+
+  name String @db.VarChar(30)
+  duration Int
+  price Decimal @db.Decimal(10,2)
+
+  schedules Schedule[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("services")
+}
+
+model Schedule {
+  id String @id @default(uuid())
+
+  customerId String @map("customer_id")
+  customer User @relation(fields: [customerId], references: [id])
+
+  employeeId String @map("employee_id")
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  companyId String @map("company_id")
+  company Company @relation(fields: [companyId], references: [id])
+
+  serviceId String @map("service_id")
+  service Service @relation(fields: [serviceId], references: [id])
+
+  startDate DateTime @map("start_date")
+  endDate DateTime @map("end_date")
+
+  status ScheduleStatusEnum
+  observation String? @db.Text()
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("schedules")
+}
