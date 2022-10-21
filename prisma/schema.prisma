@@ -12,11 +12,11 @@ datasource db {
 
 // uncomment in case of development..
 
-generator erd {
-  provider = "prisma-erd-generator"
-  output = "erd.pdf"
-  theme = "forest"
-}
+//generator erd {
+//  provider = "prisma-erd-generator"
+//  output = "erd.pdf"
+//  theme = "forest"
+//}
 
 enum ScheduleStatusEnum {
   FINISHED
