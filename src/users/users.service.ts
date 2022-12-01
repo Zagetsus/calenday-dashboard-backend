@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User as UserModel, UserPermissionEnum } from '@prisma/client';
+import { Prisma, UserPermissionEnum } from '@prisma/client';
 import { hash } from 'bcryptjs';
-import { company } from 'faker';
 import { AppLogger } from '~/app.logger';
 import { UnexpectedError } from '~/common/errors';
 import { PrismaService } from '~/common/service';

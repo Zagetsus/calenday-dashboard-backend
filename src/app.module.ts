@@ -8,6 +8,8 @@ import { SchedulesModule } from '~/schedules/schedules.module';
 import { ServicesModule } from '~/services/services.module';
 import { SpecialtiesModule } from '~/specialties/specialties.module';
 import { UsersModule } from '~/users/users.module';
+import { ProductsModule } from './products/products.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { UsersModule } from '~/users/users.module';
     EmployeesModule,
     SpecialtiesModule,
     ServicesModule,
-    SchedulesModule
+    SchedulesModule,
+    ProductsModule,
+    DashboardModule
   ],
   controllers: [RootController],
   providers: [RootService]

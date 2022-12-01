@@ -1,7 +1,9 @@
 import {
   PrismaClient,
   UserPermissionEnum,
-  EmployeeOccupationEnum
+  EmployeeOccupationEnum,
+  ProductStatusEnum,
+  ProductTypeEnum
 } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import * as faker from 'faker';
@@ -105,6 +107,73 @@ const main = async () => {
 
   await prisma.employee.createMany({
     data: employees
+  });
+
+  const categoriesData = [
+    'Shampoo',
+    'Condicionador',
+    'Kit tratamento capilar',
+    'Artigos de salão de beleza',
+    'Nutricosméticos'
+  ].map(category => ({
+    name: category
+  }));
+
+  await prisma.productCategory.createMany({
+    data: categoriesData
+  });
+
+  const categories = await prisma.productCategory.findMany();
+
+  const productsData = [
+    {
+      companyId: company.id,
+      reference: 'TEST123456',
+      name: 'Shampoo Infusion',
+      status: ProductStatusEnum.PUBLISHED,
+      brand: 'Truss',
+      price: 119.9,
+      stock: 30,
+      type: ProductTypeEnum.UNITY,
+      categoryId: categories[0].id
+    },
+    {
+      companyId: company.id,
+      reference: 'TEST23432',
+      name: 'KIT SEBASTIAN PROFESSIONAL DARK OIL',
+      status: ProductStatusEnum.PUBLISHED,
+      brand: 'SEBASTIAN',
+      price: 336.8,
+      stock: 30,
+      type: ProductTypeEnum.KIT,
+      categoryId: categories[2].id
+    },
+    {
+      companyId: company.id,
+      reference: 'TEST56984',
+      name: 'Condicionador Nutrição e Brilho Natura Plant',
+      status: ProductStatusEnum.PUBLISHED,
+      brand: 'Natura',
+      price: 150.5,
+      stock: 30,
+      type: ProductTypeEnum.UNITY,
+      categoryId: categories[1].id
+    },
+    {
+      companyId: company.id,
+      reference: 'TEST56974',
+      name: 'Renova Be Colágeno Verisol® com Ácido Hialurônico Frutado - 3 Potes',
+      status: ProductStatusEnum.PUBLISHED,
+      brand: 'RENOVA',
+      price: 267.7,
+      stock: 30,
+      type: ProductTypeEnum.KIT,
+      categoryId: categories[4].id
+    }
+  ];
+
+  await prisma.product.createMany({
+    data: productsData
   });
 };
 

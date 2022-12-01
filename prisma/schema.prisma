@@ -36,15 +36,27 @@ enum EmployeeOccupationEnum {
   MANAGER
 }
 
+enum ProductStatusEnum {
+  PUBLISHED
+  DISABLED
+  DRAFT
+}
+
+enum ProductTypeEnum {
+  UNITY
+  KIT
+}
+
 model User {
   id String @id @default(uuid())
 
   name String? @db.VarChar(150)
   email String? @db.VarChar(255) @unique
   password String? @db.VarChar(255)
+  profileImage String? @db.VarChar(255) @map("profile_image")
   phone String? @db.VarChar(11)
   document String @db.VarChar(11) @unique
-  birthDate DateTime? @map("birth_date") @db.Date()
+  birthDate DateTime? @map("birth_date") @db.Date
   permission UserPermissionEnum @default(CUSTOMER)
   isActive Boolean @default(true) @map("is_active")
 
@@ -72,6 +84,7 @@ model Company {
 
   schedules Schedule[]
   employees Employee[]
+  products Product[]
 
   createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -159,4 +172,60 @@ model Schedule {
   deletedAt DateTime? @map("deleted_at")
 
   @@map("schedules")
+}
+
+model ProductCategory {
+  id String @id @default(uuid())
+
+  name String @db.VarChar(100)
+
+  products Product[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("product_categories")
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  reference String @db.VarChar(100) @unique
+  name String @db.VarChar(150)
+  status ProductStatusEnum
+  brand String @db.VarChar(60)
+  price Decimal @db.Decimal(10,2)
+  stock Int @default(0)
+  type ProductTypeEnum?
+
+  categoryId String @map("category_id")
+  category ProductCategory @relation(fields: [categoryId], references: [id])
+
+  companyId String @map("company_id")
+  company Company @relation(fields: [companyId], references: [id])
+
+  productImages ProductImage[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("products")
+}
+
+model ProductImage {
+  id String @id @default(uuid())
+
+  productId String @map("product_id")
+  product Product @relation(fields: [productId], references: [id])
+
+  isMain Boolean @default(false) @map("is_main")
+  image String @db.VarChar(255)
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("product_images")
 }
